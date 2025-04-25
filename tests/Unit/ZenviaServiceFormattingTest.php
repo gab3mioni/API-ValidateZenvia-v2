@@ -31,4 +31,28 @@ describe('ZenviaServiceFormatting', function () {
         expect($examples)->toHaveKeys(['nome', 'pedido']);
     });
 
+    it('retorna erro se botão string ultrapassar 20 caracteres', function () {
+        $buttons = [
+            'Este texto é muito longo para ser aceito',
+        ];
+
+        $components = $this->zenvia->formatarComponentes('Mensagem', $buttons);
+
+        expect($components)->toBe(['erro' => 'Formato inválido de botão']);
+    });
+
+    it('retorna erro se botão array ultrapassar 20 caracteres', function () {
+        $buttons = [
+            [
+                'type' => 'URL',
+                'text' => 'Texto com mais de vinte caracteres',
+                'url' => 'https://exemplo.com'
+            ]
+        ];
+
+        $components = $this->zenvia->formatarComponentes('Mensagem', $buttons);
+
+        expect($components)->toBe(['erro' => 'Formato inválido de botão']);
+    });
+
 });

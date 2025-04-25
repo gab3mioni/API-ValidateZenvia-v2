@@ -14,8 +14,8 @@ class ZenviaService
         try {
             $response = Http::withHeaders([
                 'Content-Type' => 'application/json',
-                'X-API-TOKEN' => config('Zenvia.token'),
-            ])->post(config('Zenvia.url'), $templateData);
+                'X-API-TOKEN' => config('zenvia.token'),
+            ])->post(config('zenvia.url'), $templateData);
 
             if ($response->failed()) {
                 $erro = $response->json('message') ?? 'Erro desconhecido';

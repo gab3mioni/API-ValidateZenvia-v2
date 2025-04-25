@@ -19,13 +19,12 @@ class TemplateController extends Controller
 
     public function enviar(TemplateRequest $request): JsonResponse
     {
-
         if (
-            !config('zenvia.token') ||
-            !config('zenvia.url') ||
-            !config('zenvia.channel') ||
-            !config('zenvia.sender_phone') ||
-            !config('zenvia.sender_email')
+            $this->configNotValid(config('zenvia.token')) ||
+            $this->configNotValid(config('zenvia.url')) ||
+            $this->configNotValid(config('zenvia.channel')) ||
+            $this->configNotValid(config('zenvia.sender_phone')) ||
+            $this->configNotValid(config('zenvia.sender_email'))
         ) {
             return response()->json([
                 'erro' => 'Configurações da Zenvia não estão corretamente definidas.'

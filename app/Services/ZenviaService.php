@@ -64,6 +64,10 @@ class ZenviaService
 
         foreach ($buttons as $button) {
             if (is_string($button)) {
+                if (mb_strlen($button) > 20) {
+                    return ['erro' => 'Formato inválido de botão'];
+                }
+
                 $buttonItems[] = [
                     'type' => 'QUICK_REPLY',
                     'text' => $button,
@@ -73,6 +77,10 @@ class ZenviaService
             }
 
             if (is_array($button) && isset($button['text'], $button['type'])) {
+                if (mb_strlen($button['text']) > 20) {
+                    return ['erro' => 'Formato inválido de botão'];
+                }
+
                 $item = [
                     'type' => $button['type'],
                     'text' => $button['text'],

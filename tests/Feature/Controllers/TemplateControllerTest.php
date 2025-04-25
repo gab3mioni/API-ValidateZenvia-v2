@@ -5,6 +5,11 @@ use Illuminate\Support\Facades\Log;
 
 describe('TemplateController', function () {
     beforeEach(function () {
+        config()->set('zenvia.token', 'valid_token');
+        config()->set('zenvia.url', 'https://api.zenvia.com/v2/templates');
+        config()->set('zenvia.sender_phone', '+5511999999999');
+        config()->set('zenvia.sender_email', 'test@example.com');
+        config()->set('zenvia.channel', 'WHATSAPP');
         Http::fake();
         Log::spy();
     });

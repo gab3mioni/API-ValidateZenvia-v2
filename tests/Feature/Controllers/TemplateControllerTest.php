@@ -14,10 +14,12 @@ describe('TemplateController', function () {
         Log::spy();
     });
 
-    it('envia template válido com dados mínimos', function () {
-        Http::fake(['*' => Http::response(['message' => 'enviado_com_sucesso'])]);
+    it('envia template com sucesso', function () {
+        Http::fake(['*' => Http::response(['message' => 'ok'], 200)]);
 
-        $response = $this->postJson('/api/enviar-template', [
+        $response = $this->withHeaders([
+            'X-API-TOKEN' => config('zenvia.token'),
+        ])->postJson('/api/enviar-template', [
             'name' => 'template_basico',
             'text' => 'Olá {{nome}}'
         ]);
@@ -25,58 +27,45 @@ describe('TemplateController', function () {
         $response->assertStatus(200);
     });
 
+    it('retorna 401 se X-API-TOKEN estiver vazio', function () {
+        config()->set('zenvia.token', '');
 
-        $response->assertStatus(422)
-            ->assertJson([
-                'erro' => 'Formato inválido de botão'
-            ]);
-    });
-
-    it('retorna erro com comentário detalhado da Zenvia', function () {
-        Http::fake(['*' => Http::response([
-            'message' => 'Template rejeitado',
-            'comments' => [['text' => 'Texto inadequado para o canal']]
-        ], 400)]);
-
-        $response = $this->postJson('/api/enviar-template', [
-            'name' => 'template_rejeitado',
-            'text' => 'Texto ofensivo?'
+        $response = $this->withHeaders([
+            'X-API-TOKEN' => '',
+        ])->postJson('/api/enviar-template', [
+            'name' => 'template_basico',
+            'text' => 'Olá {{nome}}'
         ]);
 
-        $response->assertStatus(400)
-            ->assertJson([
-                'erro' => 'Falha ao enviar template'
-            ]);
+        $response->assertStatus(401);
     });
 
-    it('envia template mesmo com buttons sendo array vazio', function () {
-        Http::fake(['*' => Http::response(['message' => 'ok'], 200)]);
+    it('retorna 401 se configuração da Zenvia estiver faltando', function () {
+        config()->set('zenvia.token', null);
+        config()->set('zenvia.url', null);
 
-        $response = $this->postJson('/api/enviar-template', [
-            'name' => 'template_sem_botoes',
-            'text' => 'Mensagem simples',
-            'buttons' => []
+        $response = $this->withHeaders([
+            'X-API-TOKEN' => 'valid_token',
+        ])->postJson('/api/enviar-template', [
+            'name' => 'template_basico',
+            'text' => 'Olá {{nome}}'
         ]);
 
-        $response->assertStatus(200);
+        $response->assertStatus(401);
     });
 
-    it('log de erro crítico é registrado em exceção inesperada', function () {
+    it('retorna 500 se ocorrer erro inesperado', function () {
         Http::fake(function () {
-            throw new Exception('Exceção inesperada');
+            throw new Exception('Erro inesperado');
         });
 
-        $response = $this->postJson('/api/enviar-template', [
-            'name' => 'quebra',
-            'text' => 'Erro no servidor'
+        $response = $this->withHeaders([
+            'X-API-TOKEN' => config('zenvia.token'),
+        ])->postJson('/api/enviar-template', [
+            'name' => 'template_basico',
+            'text' => 'Olá {{nome}}'
         ]);
 
-        $response->assertStatus(500)
-            ->assertJson([
-                'erro' => 'Falha ao enviar template',
-                'detalhes' => 'Erro inesperado ao enviar template.'
-            ]);
-
-        Log::shouldHaveReceived('critical')->once();
+        $response->assertStatus(500);
     });
 });

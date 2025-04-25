@@ -55,4 +55,32 @@ describe('ZenviaServiceFormatting', function () {
         expect($components)->toBe(['erro' => 'Formato inválido de botão']);
     });
 
+    it('retorna erro se URL do botão for inválida', function () {
+        $buttons = [
+            [
+                'type' => 'URL',
+                'text' => 'Site',
+                'url' => 'isso_nao_e_uma_url'
+            ]
+        ];
+
+        $components = $this->zenvia->formatarComponentes('Mensagem', $buttons);
+
+        expect($components)->toBe(['erro' => 'Formato inválido de botão URL']);
+    });
+
+    it('retorna erro se URL do botão for inválida (contendo https no POST)', function () {
+        $buttons = [
+            [
+                'type' => 'URL',
+                'text' => 'Site',
+                'url' => 'https...'
+            ]
+        ];
+
+        $components = $this->zenvia->formatarComponentes('Mensagem', $buttons);
+
+        expect($components)->toBe(['erro' => 'Formato inválido de botão URL']);
+    });
+
 });

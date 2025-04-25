@@ -58,7 +58,9 @@ class ZenviaService
             ]
         ];
 
-        if (empty($buttons)) return $components;
+        if (empty($buttons)) {
+            return $components;
+        }
 
         $buttonItems = [];
 
@@ -99,7 +101,6 @@ class ZenviaService
                     $item['phoneNumber'] = $button['phone_number'];
                 }
 
-
                 $buttonItems[] = $item;
             }
         }
@@ -111,6 +112,7 @@ class ZenviaService
 
         return $components;
     }
+
 
     public function gerarExamples(string $text): array
     {

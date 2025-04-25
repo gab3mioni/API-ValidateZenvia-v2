@@ -60,4 +60,22 @@ class TemplateController extends Controller
             ], 500);
         }
     }
+
+    private function montarTemplateData(array $data): array
+    {
+        $components = $this->zenvia->formatarComponentes($data['text'], $data['buttons'] ?? []);
+        $examples = $this->zenvia->gerarExamples($data['text']);
+
+        return [
+            'name' => $data['name'],
+            'locale' => 'pt_BR',
+            'channel' => config('zenvia.channel'),
+            'senderId' => config('zenvia.sender_phone'),
+            'notificationEmail' => config('zenvia.sender_email'),
+            'category' => 'UTILITY',
+            'components' => $components,
+            'examples' => $examples
+        ];
+    }
+
 }

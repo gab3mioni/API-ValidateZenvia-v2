@@ -20,6 +20,17 @@ class TemplateController extends Controller
     public function enviar(TemplateRequest $request): JsonResponse
     {
 
+        if (
+            !config('zenvia.token') ||
+            !config('zenvia.url') ||
+            !config('zenvia.channel') ||
+            !config('zenvia.sender_phone') ||
+            !config('zenvia.sender_email')
+        ) {
+            return response()->json([
+                'erro' => 'Configurações da Zenvia não estão corretamente definidas.'
+            ], 401);
+        }
 
         try {
             $data = $request->validated();

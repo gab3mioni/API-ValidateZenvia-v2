@@ -61,6 +61,11 @@ class TemplateController extends Controller
         }
     }
 
+    private function configNotValid($value): bool
+    {
+        return empty($value) || trim($value) === '';
+    }
+
     private function montarTemplateData(array $data): array
     {
         $components = $this->zenvia->formatarComponentes($data['text'], $data['buttons'] ?? []);

@@ -19,22 +19,11 @@ class TemplateController extends Controller
 
     public function enviar(TemplateRequest $request): JsonResponse
     {
+
+
         try {
             $data = $request->validated();
-
-            $components = $this->zenvia->formatarComponentes($data['text'], $data['buttons'] ?? []);
-            $examples = $this->zenvia->gerarExamples($data['text']);
-
-            $templateData = [
-                'name' => $data['name'],
-                'locale' => 'pt_BR',
-                'channel' => env('CHANNEL', 'WHATSAPP'),
-                'senderId' => env('SENDER_PHONE'),
-                'notificationEmail' => env('SENDER_EMAIL'),
-                'category' => 'UTILITY',
-                'components' => $components,
-                'examples' => $examples
-            ];
+            $templateData = $this->montarTemplateData($data);
 
             [$resultado, $status, $erro] = $this->zenvia->enviarTemplate($templateData);
 

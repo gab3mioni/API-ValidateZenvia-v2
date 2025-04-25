@@ -49,7 +49,66 @@ class ZenviaService
         }
     }
 
+    public function formatarComponentes(string $text, array $buttons): array
+    {
+        $components = [
+            'body' => [
+                'type' => 'TEXT_FIXED',
+                'text' => $text
+            ]
+        ];
+
+        if (empty($buttons)) return $components;
+
+        $buttonItems = [];
+
+        foreach ($buttons as $button) {
+            if (is_string($button)) {
+                $buttonItems[] = [
+                    'type' => 'QUICK_REPLY',
+                    'text' => $button,
+                    'payload' => $button
+                ];
+                continue;
+            }
+
+            if (is_array($button) && isset($button['text'], $button['type'])) {
+                $item = [
+                    'type' => $button['type'],
+                    'text' => $button['text'],
+                    'payload' => $button['text']
+                ];
+
+                if ($button['type'] === 'URL') {
+                    if (empty($button['url'])) {
+                        continue;
+                    }
+                    $item['url'] = $button['url'];
+                } elseif ($button['type'] === 'PHONE_NUMBER') {
+                    if (empty($button['phone_number'])) {
+                        continue;
+                    }
+                    $item['phoneNumber'] = $button['phone_number'];
+                }
+
+
+                $buttonItems[] = $item;
+            }
         }
 
+        $components['buttons'] = [
+            'type' => 'MIXED',
+            'items' => $buttonItems
+        ];
+
+        return $components;
+    }
+
+    public function gerarExamples(string $text): array
+    {
+        preg_match_all('/{{(.*?)}}/', $text, $matches);
+        $variaveis = $matches[1] ?? [];
+
+        return collect($variaveis)->mapWithKeys(fn($v) => [trim($v) => 'Exemplo'])->toArray();
     }
 }

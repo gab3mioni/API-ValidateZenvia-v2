@@ -88,8 +88,8 @@ class ZenviaService
                 ];
 
                 if ($button['type'] === 'URL') {
-                    if (empty($button['url'])) {
-                        continue;
+                    if (empty($button['url']) || !filter_var($button['url'], FILTER_VALIDATE_URL)) {
+                        return ['erro' => 'Formato inválido de botão URL'];
                     }
                     $item['url'] = $button['url'];
                 } elseif ($button['type'] === 'PHONE_NUMBER') {

@@ -76,4 +76,18 @@ describe('ZenviaServiceFormatting', function () {
         expect($components)->toBe(['erro' => 'Formato inválido de botão URL']);
     });
 
+    it('retorna erro se URL do botão for vazia', function () {
+        $buttons = [
+            [
+                'type' => 'URL',
+                'text' => 'Site',
+                'url' => ''
+            ]
+        ];
+
+        $components = $this->zenvia->formatarComponentes('Mensagem', $buttons);
+
+        expect($components)->toBe(['erro' => 'Formato inválido de botão URL']);
+    });
+
 });

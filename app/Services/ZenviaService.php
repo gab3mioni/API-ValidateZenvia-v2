@@ -94,11 +94,6 @@ class ZenviaService
                         return ['erro' => 'Formato inválido de botão URL'];
                     }
                     $item['url'] = $button['url'];
-                } elseif ($button['type'] === 'PHONE_NUMBER') {
-                    if (empty($button['phone_number'])) {
-                        continue;
-                    }
-                    $item['phoneNumber'] = $button['phone_number'];
                 }
 
                 $buttonItems[] = $item;
@@ -112,7 +107,6 @@ class ZenviaService
 
         return $components;
     }
-
 
     public function gerarExamples(string $text): array
     {

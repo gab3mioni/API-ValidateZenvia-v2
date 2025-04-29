@@ -7,6 +7,10 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(RefreshDatabase::class);
 
+beforeEach(function () {
+    Queue::fake();
+});
+
 it('despacha jobs para templates com status WAITING_APROVAL', function () {
     Queue::fake();
 

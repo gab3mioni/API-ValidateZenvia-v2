@@ -32,3 +32,11 @@ it('não despacha jobs se não houver templates pendentes', function () {
 
     Queue::assertNotPushed(VerificarTemplateStatusJob::class);
 });
+
+it('exibe mensagem se não houver templates aguardando aprovação', function () {
+    $this->artisan('verificar:templates')
+        ->expectsOutput('Nenhum template aguardando aprovação.')
+        ->assertExitCode(0);
+
+    Queue::assertNothingPushed();
+});

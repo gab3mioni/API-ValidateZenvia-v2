@@ -121,3 +121,26 @@ it('não atualiza motivo de rejeição se comments não for array ou for vazio',
     expect($template->status)->toBe('REJECTED')
         ->and($template->motivo_rejeicao)->toBeNull();
 });
+
+it('atualiza motivo de rejeição corretamente com comentário válido', function () {
+    $template = Template::factory()->create([
+        'status' => 'WAITING_APROVAL',
+        'motivo_rejeicao' => null,
+    ]);
+
+    Http::fake([
+        "https://api.zenvia.com/v2/templates/{$template->id}" => Http::response([
+            'status' => 'REJECTED',
+            'comments' => [
+                ['text' => 'Mensagem rejeitada por spam.']
+            ],
+        ], 200),
+    ]);
+
+    (new VerificarTemplateStatusJob($template))->handle();
+
+    $template->refresh();
+    expect($template->status)->toBe('REJECTED')
+        ->and($template->motivo_rejeicao)->toBe('Mensagem rejeitada por spam.');
+});
+

@@ -2,6 +2,7 @@
 
 use App\Models\Template;
 use App\Jobs\VerificarTemplateStatusJob;
+use App\Services\TemplateService;
 use Illuminate\Support\Facades\Queue;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
@@ -71,4 +72,17 @@ it('não despacha jobs para templates com status diferente de WAITING_APROVAL', 
         ->assertExitCode(0);
 
     Queue::assertNotPushed(VerificarTemplateStatusJob::class);
+});
+
+it('exibe mensagem de erro ao falhar ao buscar templates', function () {
+    $this->mock(TemplateService::class, function ($mock) {
+        $mock->shouldReceive('buscarTemplatesAguardandoAprovacao')
+            ->andThrow(new \Exception('Erro ao buscar templates'));
+    });
+
+    $this->artisan('verificar:templates')
+        ->expectsOutput('Erro ao buscar templates: Erro ao buscar templates')
+        ->assertExitCode(1);
+
+    Queue::assertNothingPushed();
 });

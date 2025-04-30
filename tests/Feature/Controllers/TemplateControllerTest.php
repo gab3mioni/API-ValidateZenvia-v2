@@ -54,6 +54,26 @@ describe('TemplateController', function () {
         $response->assertStatus(401);
     });
 
+    it('retorna 401 se qualquer configuração obrigatória estiver vazia', function () {
+        config()->set('zenvia.token', '');
+        config()->set('zenvia.url', '');
+        config()->set('zenvia.channel', '');
+        config()->set('zenvia.sender_phone', '');
+        config()->set('zenvia.sender_email', '');
+
+        $response = $this->withHeaders([
+            'X-API-TOKEN' => '',
+        ])->postJson('/api/enviar-template', [
+            'name' => 'template_falho',
+            'text' => 'Mensagem teste'
+        ]);
+
+        $response->assertStatus(401)
+            ->assertJson([
+                'erro' => 'Configurações da Zenvia não estão corretamente definidas.'
+            ]);
+    });
+
     it('retorna 500 se ocorrer erro inesperado', function () {
         Http::fake(function () {
             throw new Exception('Erro inesperado');

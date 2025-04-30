@@ -11,9 +11,14 @@ class VerificarTemplates extends Command
     protected $signature = 'verificar:templates';
     protected $description = 'Verifica o status dos templates pendentes na Zenvia';
 
-    public function handle()
+    public function handle(): int
     {
-        $templates = Template::where('status', 'WAITING_APROVAL')->get();
+        try {
+            $templates = Template::where('status', 'WAITING_APROVAL')->get();
+        } catch (\Throwable $e) {
+            $this->error('Erro ao buscar templates: ' . $e->getMessage());
+            return 1;
+        }
 
         if ($templates->isEmpty()) {
             $this->info('Nenhum template aguardando aprovação.');

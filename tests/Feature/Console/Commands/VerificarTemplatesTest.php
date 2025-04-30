@@ -61,3 +61,14 @@ it('despacha jobs para cada template pendente', function () {
         return $job->getTemplate()->id === $template2->id;
     });
 });
+
+it('não despacha jobs para templates com status diferente de WAITING_APROVAL', function () {
+    $template1 = Template::factory()->create(['status' => 'APPROVED']);
+    $template2 = Template::factory()->create(['status' => 'REJECTED']);
+
+    $this->artisan('verificar:templates')
+        ->expectsOutput('Nenhum template aguardando aprovação.')
+        ->assertExitCode(0);
+
+    Queue::assertNotPushed(VerificarTemplateStatusJob::class);
+});

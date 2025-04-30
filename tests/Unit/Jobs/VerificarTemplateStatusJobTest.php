@@ -101,3 +101,23 @@ it('não quebra se resposta da API não tiver campo status', function () {
     $template->refresh();
     expect($template->status)->toBe('WAITING_APROVAL'); // Status não muda
 });
+
+it('não atualiza motivo de rejeição se comments não for array ou for vazio', function () {
+    $template = Template::factory()->create([
+        'status' => 'WAITING_APROVAL',
+        'motivo_rejeicao' => null,
+    ]);
+
+    Http::fake([
+        "https://api.zenvia.com/v2/templates/{$template->id}" => Http::response([
+            'status' => 'REJECTED',
+            'comments' => '', // inválido
+        ], 200),
+    ]);
+
+    (new VerificarTemplateStatusJob($template))->handle();
+
+    $template->refresh();
+    expect($template->status)->toBe('REJECTED')
+        ->and($template->motivo_rejeicao)->toBeNull();
+});

@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Services\TemplateService;
 use Illuminate\Console\Command;
 use App\Models\Template;
 use App\Jobs\VerificarTemplateStatusJob;
@@ -11,10 +12,18 @@ class VerificarTemplates extends Command
     protected $signature = 'verificar:templates';
     protected $description = 'Verifica o status dos templates pendentes na Zenvia';
 
+    private TemplateService $templateService;
+
+    public function __construct(TemplateService $templateService)
+    {
+        parent::__construct();
+        $this->templateService = $templateService;
+    }
+
     public function handle(): int
     {
         try {
-            $templates = Template::where('status', 'WAITING_APROVAL')->get();
+            $templates = $this->templateService->buscarTemplatesAguardandoAprovacao();
         } catch (\Throwable $e) {
             $this->error('Erro ao buscar templates: ' . $e->getMessage());
             return 1;

@@ -17,7 +17,7 @@ class VerificarTemplates extends Command
 
         if ($templates->isEmpty()) {
             $this->info('Nenhum template aguardando aprovação.');
-            return;
+            return 0;
         }
 
         foreach ($templates as $template) {
@@ -25,5 +25,6 @@ class VerificarTemplates extends Command
         }
 
         $this->info('Jobs para verificação de templates foram enviados para a fila.');
+        return 0;
     }
 }

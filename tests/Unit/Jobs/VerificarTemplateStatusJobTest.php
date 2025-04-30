@@ -84,3 +84,20 @@ it('gera log de erro ao lançar exceção', function () {
 
     Log::shouldHaveReceived('error')->once();
 });
+
+it('não quebra se resposta da API não tiver campo status', function () {
+    $template = Template::factory()->create([
+        'status' => 'WAITING_APROVAL',
+    ]);
+
+    Http::fake([
+        "https://api.zenvia.com/v2/templates/{$template->id}" => Http::response([
+            'other_field' => 'unexpected_value',
+        ], 200),
+    ]);
+
+    (new VerificarTemplateStatusJob($template))->handle();
+
+    $template->refresh();
+    expect($template->status)->toBe('WAITING_APROVAL'); // Status não muda
+});
